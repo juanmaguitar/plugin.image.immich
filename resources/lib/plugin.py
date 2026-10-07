@@ -102,7 +102,7 @@ def root():
     client = ImmichClient(timeout=PROBE_TIMEOUT)
     probe = Probe()
     if probe(lambda: client.partners(), [], []):
-        folder(kodi.L(30027), 'partners', tiles.art('timeline'))
+        folder(kodi.L(30027) or 'Partners', 'partners', tiles.art('timeline'))   # Kodi keeps old strings until it restarts
     memories = probe(lambda: client.memories(date.today()), [], [])
     if memories:
         folder(kodi.L(30017), 'memories', tiles.art('memories'), label2=count(sum(len(m[1]) for m in memories)),
