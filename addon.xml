@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.image.immich" name="Immich" version="0.3.10" provider-name="kel-mo">
+  <requires>
+    <import addon="xbmc.python" version="3.0.1"/>
+  </requires>
+  <extension point="xbmc.python.pluginsource" library="default.py">
+    <provides>image</provides>
+  </extension>
+  <extension point="xbmc.service" library="service.py"/>
+  <extension point="xbmc.ui.screensaver" library="screensaver.py"/>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">View your Immich photos and videos in Kodi</summary>
+    <description lang="en_GB">Browse the timeline, On this day, people and pets, places, albums and favourites of a self-hosted Immich server, or search by description. Watch them as a slideshow that crossfades and slowly pans and zooms across each photo, with photo details at the press of Info. View only: nothing is changed on the server.</description>
+    <disclaimer lang="en_GB">Requires an Immich server that you own or have an account on. Not affiliated with the Immich project.</disclaimer>
+    <platform>all</platform>
+    <license>GPL-2.0-or-later</license>
+    <source>https://github.com/kel-mo/plugin.image.immich</source>
+    <website>https://immich.app</website>
+    <news>v0.3.10
+- A thinner outline behind the slideshow caption, date and clock
+- Kodi quits promptly even with a photo on its way through the proxy
+v0.3.9
+- Folder backgrounds show the whole photo, on a blurred copy of itself, instead of a crop
+v0.3.8
+- Years and months in Timeline, and countries in Places, show one of their photos
+v0.3.7
+- Tile names are drawn properly with the Estuary skin's font
+v0.3.6
+- Favourites that showed a tile go back to the Immich icon by themselves, keeping their place
+v0.3.5
+- Tiles stay on the menu: Immich favourites no longer get one, so pick a thumbnail again for any that did
+- Kodi quits promptly even with a photo or tile request under way
+v0.3.4
+- Kodi no longer waits long on a slow server when it quits while tiles are drawn
+v0.3.3
+- Long tile names wrap onto two lines, so every name stays larger
+- Tiles redraw straight after an update
+v0.3.2
+- Shuffle everything gets a photo tile too
+- A soft shadow keeps tile names readable on bright photos
+v0.3.1
+- Photo tiles: the menu and Immich favourites show one of your photos with the folder's name, a new one each day
+- Rotated phone portraits zoom again on 4K screens
+v0.3.0
+- Pausing eases the photo back to the whole picture and shows it at its sharpest
+- The caption, clock and Paused have an outline instead of a dark band along the screen edge
+v0.2.9
+- Smooth zoom setting: stops sand, leaves and other fine detail from shimmering, on Kodi builds that support mipmapped textures</news>
+    <assets>
+      <icon>resources/icon.png</icon>
+    </assets>
+  </extension>
+</addon>
