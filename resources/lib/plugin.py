@@ -335,8 +335,10 @@ def album(client, params):
 
 
 def person(client, params):
-    searched(client, params, {'source': 'person', 'person_id': params['person_id']}, personIds=[params['person_id']],
-             visibility=TIMELINE)
+    page = int(params.get('page') or 1)
+    found, has_more = client.person_assets(params['person_id'], page, page_size())
+    list_assets(client, found, {'source': 'person', 'person_id': params['person_id']}, params.get('name'),
+                dict(params, page=page + 1) if has_more else None)
 
 
 def place_filters(params):
@@ -370,7 +372,7 @@ def source_assets(client, params):
     if kind == 'place':
         return client.search(visibility=TIMELINE, **place_filters(params))
     if kind == 'person':
-        return client.search(personIds=[params['person_id']], visibility=TIMELINE)
+        return client.person_assets(params['person_id'])[0]
     if kind == 'random':
         return client.random()
     return []

@@ -40,6 +40,10 @@ ALBUMS = [{'id': 'album-1', 'albumName': 'Holidays', 'members': ASSETS[0:40]},
 PEOPLE = [{'id': 'person-{}'.format(i), 'name': name, 'isHidden': False, 'isFavorite': False,
            'members': [a for a in ASSETS if a['n'] % 5 == i]}
           for i, name in enumerate(['Alex', '', 'Sam', '', ''])]
+# shared from the partner's cluster: all its photos are theirs, and they keep them off your timeline
+SHARED = {'id': 'person-shared', 'name': 'Laura', 'isHidden': False, 'isFavorite': False, 'partner': True,
+          'members': [a for a in ASSETS if a['n'] % 3 == 0 and a['n'] % 4 == 1]}
+PEOPLE.append(SHARED)
 FAVOURITES = [a for a in ASSETS if a['n'] % 5 == 0]
 
 
@@ -48,7 +52,8 @@ def filtered(body):
     if body.get('albumIds'):
         items = next((al['members'] for al in ALBUMS if al['id'] == body['albumIds'][0]), [])
     if body.get('personIds'):
-        items = next((p['members'] for p in PEOPLE if p['id'] == body['personIds'][0]), [])
+        pe = next((p for p in PEOPLE if p['id'] == body['personIds'][0]), {})
+        items = [] if pe.get('partner') else pe.get('members') or []   # search skips partners off the timeline
     if body.get('city'):
         items = [a for a in items if a['city'] == body['city']]
     if body.get('isFavorite'):
@@ -141,9 +146,12 @@ class Handler(BaseHTTPRequestHandler):
             items = next((al['members'] for al in ALBUMS if al['id'] == q['albumId']), [])
         if q.get('isFavorite') == 'true':
             items = [a for a in items if a['n'] % 5 == 0]
+        if q.get('personId'):
+            pe = next((x for x in PEOPLE if x['id'] == q['personId']), {})
+            items = pe.get('members') or [] if q.get('withPartners') == 'true' or not pe.get('partner') else []
         if q.get('userId') == PARTNER['id']:
             items = [a for a in items if a['n'] % 3 == 0]
-        elif q.get('userId'):
+        elif q.get('userId') not in (None, 'u1'):
             return self.send(400, {'message': 'Not found or no timeline.read access'})
         if p == '/api/users/me':
             return self.send(200, {'id': 'u1', 'name': 'Kodi Tester', 'email': 'kodi@example.com'})

@@ -159,6 +159,25 @@ class ImmichClient:
         cols = self.get('/timeline/bucket', timeBucket=time_bucket, **_filters(filters)) or {}
         return [from_bucket(row) for row in _rows(cols)]
 
+    def person_assets(self, person_id, page=None, size=None):
+        """A person's photos, newest first, partners' included: (assets, more pages follow).
+        Search leaves out partners kept off your timeline; the timeline with personId keeps them, as the web does."""
+        if not getattr(self, 'user_id', None):
+            self.user_id = (self.me() or {}).get('id')
+        filters = {'personId': person_id, 'userId': self.user_id, 'withPartners': True}
+        start = (page - 1) * size if page else 0
+        end = start + size if page else None
+        out, seen = [], 0
+        for b in self.timeline_buckets(**filters) or []:
+            count = b.get('count') or 0
+            if end is not None and seen >= end:
+                return out, True
+            if seen + count > start:
+                found = self.timeline_bucket(b['timeBucket'], **filters)
+                out += found[max(start - seen, 0):None if end is None else end - seen]
+            seen += count
+        return out, False
+
     def albums(self):
         return self.get('/albums') or []
 

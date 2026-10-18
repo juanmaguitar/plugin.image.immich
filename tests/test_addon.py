@@ -992,6 +992,28 @@ class Partners(NoProxy):
         mine = plugin.source_assets(self.client, {'source': 'bucket', 'bucket': bucket})
         self.assertGreater(len(mine), len(shown))
 
+    def test_shared_person_shows_the_partners_photos(self):
+        """Search skips partners kept off your timeline; a person's photos must not."""
+        theirs = [a['id'] for a in mock_immich.SHARED['members']]
+        del xbmcplugin.ITEMS[:]
+        plugin.person(self.client, {'person_id': 'person-shared'})
+        photos = [li for url, li, is_folder in xbmcplugin.ITEMS
+                  if not is_folder and ('start=' in url or 'action=play' not in url)]   # not the play-all entry
+        self.assertEqual(len(photos), min(len(theirs), plugin.page_size()))
+        shown = plugin.source_assets(self.client, {'source': 'person', 'person_id': 'person-shared'})
+        self.assertEqual([a['id'] for a in shown], theirs)
+
+    def test_person_pages_follow_on(self):
+        alex = [a['id'] for a in mock_immich.PEOPLE[0]['members']]
+        size = 10
+        first, more = self.client.person_assets('person-0', 1, size)
+        second, _ = self.client.person_assets('person-0', 2, size)
+        self.assertTrue(more)
+        self.assertEqual([a['id'] for a in first + second], alex[:2 * size])
+        last, more = self.client.person_assets('person-0', len(alex) // size + 1, size)
+        self.assertFalse(more)
+        self.assertEqual([a['id'] for a in last], alex[len(alex) // size * size:])
+
     def test_covers_kept_apart_per_user(self):
         uid = mock_immich.PARTNER['id']
         plugin.timeline(self.client)
